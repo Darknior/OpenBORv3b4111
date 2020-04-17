@@ -142,11 +142,11 @@ BUILD_PTHREAD   = 1
 BUILD_SDL_IO    = 1
 BUILD_TREMOR    = 1
 BUILDING        = 1
-CC  	        = $(PNDDEV)/bin/arm-none-linux-gnueabi-gcc
+CC  	        = gcc
 INCLUDES        = $(PNDDEV)/include \
                   $(PNDDEV)/include/SDL
 OBJTYPE         = elf
-LIBRARIES       = $(PNDDEV)/lib
+LIBRARIES       = ./lib
 ifeq ($(BUILD_PANDORA), 0)
 BUILD_DEBUG     = 1
 endif
@@ -263,7 +263,7 @@ ifdef BUILD_DARWIN
 STRIP           = $(PREFIX)strip $(TARGET) -o $(TARGET_FINAL)
 endif
 ifdef BUILD_PANDORA
-STRIP 	        = $(PNDDEV)/bin/arm-none-linux-gnueabi-strip $(TARGET) -o $(TARGET_FINAL)
+STRIP 	        = strip $(TARGET) -o $(TARGET_FINAL)
 endif
 ifdef BUILD_GP2X
 STRIP 	        = $(GP2XDEV)/arm-open2x-linux-strip $(TARGET) -o $(TARGET_FINAL)
@@ -506,7 +506,8 @@ OBJS            = $(MAIN)                                                       
 #----------------------------------------------------------------------------------------------------
 
 CFLAGS 	       += $(addprefix -I", $(addsuffix ", $(INCS))) $(ARCHFLAGS) -D$(TARGET_PLATFORM)
-CFLAGS 	       += -g -Wall -Werror -fsigned-char
+CFLAGS 	       += -g -Wall -Werror -fsigned-char -std=gnu99
+CFLAGS         += -marm -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -fomit-frame-pointer -ffast-math -O2
 
 ifndef BUILD_GP2X
 ifndef BUILD_DARWIN
@@ -637,7 +638,7 @@ ifdef BUILD_SDL
 ifeq ($(findstring DGE, $(SDKPATH)), DGE)
 LIBS           += -lSDL -lSDL_gfx -lts
 else
-LIBS           += -Wl,-rpath,$(LIBRARIES) -lSDL2 -lSDL2_gfx
+LIBS           += -Wl,-rpath,$(LIBRARIES) -lSDL2 -lSDL2 -lGL
 endif
 endif
 
